@@ -7,3 +7,8 @@ export const productValidation = Joi.object({
     price: Joi.number()
         .required(),
 }).options({abortEarly: false})
+
+export interface ProductRequest {
+    name: string,
+    price: number
+}

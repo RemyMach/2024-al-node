@@ -4,11 +4,6 @@ export interface ValidationError {
     [key: string]: string
 }
 
-// {
-//     "name": "",
-//     "price": "",
-// }
-
 export const generateValidationErrorMessage = (
     errorDetails: Joi.ValidationErrorItem[]
 ): ValidationError => {
