@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:dev": "nodemon -e ts --exec ts-node src/index.ts"
+    "start:dev": "nodemon -e ts --exec ts-node src/index.ts",
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "keywords": [],
   "author": "",
