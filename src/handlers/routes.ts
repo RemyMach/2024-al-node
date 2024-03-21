@@ -1,8 +1,9 @@
 import express, { Request, Response } from "express";
-import { ProductRequest, productValidation } from "./validators/product-validator";
+import { listProductValidation as listProductsValidation, ProductRequest, productValidation } from "./validators/product-validator";
 import { generateValidationErrorMessage } from "./validators/generate-validation-message";
 import { AppDataSource } from "../database/database";
-import { ProductDB } from "../database/entities/product";
+import { Product } from "../database/entities/product";
+import { ProductUsecase } from "../domain/product-usecase";
 
 export const initRoutes = (app: express.Express) => {
     app.get("/health", (req: Request, res: Response) => {
@@ -10,20 +11,20 @@ export const initRoutes = (app: express.Express) => {
     })
 
     app.post("/products", async (req: Request, res: Response) => {
-        const { error, value } = productValidation.validate(req.body)
+        const validation = productValidation.validate(req.body)
 
-        if (error) {
-            res.status(400).send(generateValidationErrorMessage(error.details))
+        if (validation.error) {
+            res.status(400).send(generateValidationErrorMessage(validation.error.details))
             return
         }
 
-        const productRequest = value as ProductRequest
-        const productRepo = AppDataSource.getRepository(ProductDB)
+        const productRequest = validation.value
+        const productRepo = AppDataSource.getRepository(Product)
         try {
 
-            const productCreated = await productRepo.save({
-                ...productRequest
-            })
+            const productCreated = await productRepo.save(
+                productRequest
+            )
             res.status(201).send(productCreated)
         } catch (error) {
             res.status(500).send({ error: "Internal error" })
@@ -31,12 +32,26 @@ export const initRoutes = (app: express.Express) => {
     })
 
     app.get("/products", async (req: Request, res: Response) => {
+        const validation = listProductsValidation.validate(req.query)
 
-        const productRepo = AppDataSource.getRepository(ProductDB)
+        if (validation.error) {
+            res.status(400).send(generateValidationErrorMessage(validation.error.details))
+            return
+        }
+
+        const listProductRequest = validation.value
+        let limit = 20
+        if (listProductRequest.limit) {
+            limit = listProductRequest.limit
+        }
+        const page = listProductRequest.page ?? 1
+
         try {
-            const products = await productRepo.find()
-            res.status(200).send(products)
+            const productUsecase = new ProductUsecase(AppDataSource);
+            const listProducts = await productUsecase.listProduct({ ...listProductRequest, page, limit })
+            res.status(200).send(listProducts)
         } catch (error) {
+            console.log(error)
             res.status(500).send({ error: "Internal error" })
         }
     })

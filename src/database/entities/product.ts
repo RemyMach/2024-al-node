@@ -1,7 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: "product" })
-export class ProductDB {
+export class Product {
     @PrimaryGeneratedColumn()
     id: number
 
@@ -11,9 +11,13 @@ export class ProductDB {
     @Column()
     price: number
 
-    constructor(id: number, name: string, price: number) {
+    @CreateDateColumn({type: "datetime"})
+    createdAt: Date
+
+    constructor(id: number, name: string, price: number, createdAt: Date) {
         this.id = id
         this.name = name
         this.price = price
+        this.createdAt = createdAt
     }
 }
