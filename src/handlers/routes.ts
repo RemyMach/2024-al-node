@@ -11,14 +11,19 @@ export const initRoutes = (app: express.Express) => {
     })
 
     app.post("/products", async (req: Request, res: Response) => {
-        const validation = productValidation.validate(req.body)
-
-        if (validation.error) {
-            res.status(400).send(generateValidationErrorMessage(validation.error.details))
+        if (req.body.name === undefined || typeof req.body.name !== 'string' || req.body.name.length < 3) {
+            res.status(400).send({
+                name: "name has to be defined, has to be a string and need to have a size upper than 3"
+            })
             return
         }
 
-        const productRequest = validation.value
+
+
+        const productRequest: ProductRequest = {
+            name: "fdsfkds",
+            price: 2
+        }
         const productRepo = AppDataSource.getRepository(Product)
         try {
 
