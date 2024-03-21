@@ -23,5 +23,15 @@ export const listProductValidation = Joi.object<ListProductRequest>({
 export interface ListProductRequest {
     page?: number
     limit?: number
-    priceMax: number
+    priceMax?: number
+}
+
+export const updateProductValidation = Joi.object<UpdateProductRequest>({
+    id: Joi.number().required(),
+    price: Joi.number().min(1).optional()
+})
+
+export interface UpdateProductRequest {
+    id: number
+    price?: number
 }

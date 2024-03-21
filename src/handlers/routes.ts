@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { listProductValidation as listProductsValidation, ProductRequest, productValidation } from "./validators/product-validator";
+import { listProductValidation as listProductsValidation, ProductRequest, productValidation, updateProductValidation } from "./validators/product-validator";
 import { generateValidationErrorMessage } from "./validators/generate-validation-message";
 import { AppDataSource } from "../database/database";
 import { Product } from "../database/entities/product";
@@ -50,6 +50,31 @@ export const initRoutes = (app: express.Express) => {
             const productUsecase = new ProductUsecase(AppDataSource);
             const listProducts = await productUsecase.listProduct({ ...listProductRequest, page, limit })
             res.status(200).send(listProducts)
+        } catch (error) {
+            console.log(error)
+            res.status(500).send({ error: "Internal error" })
+        }
+    })
+
+    app.patch("/products/:id", async (req: Request, res: Response) => {
+
+        const validation = updateProductValidation.validate({...req.params, ...req.body})
+
+        if (validation.error) {
+            res.status(400).send(generateValidationErrorMessage(validation.error.details))
+            return
+        }
+
+        const updateProductRequest = validation.value
+
+        try {
+            const productUsecase = new ProductUsecase(AppDataSource);
+            const updatedProduct = await productUsecase.updateProduct(updateProductRequest.id, { ...updateProductRequest })
+            if (updatedProduct === null) {
+                res.status(404).send({"error": `product ${updateProductRequest.id} not found`})
+                return
+            }
+            res.status(200).send(updatedProduct)
         } catch (error) {
             console.log(error)
             res.status(500).send({ error: "Internal error" })

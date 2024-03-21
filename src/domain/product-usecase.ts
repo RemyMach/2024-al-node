@@ -7,6 +7,10 @@ export interface ListProductFilter {
     priceMax?: number
 }
 
+export interface UpdateProductParams {
+    price?: number
+}
+
 export class ProductUsecase {
     constructor(private readonly db: DataSource) { }
 
@@ -24,5 +28,18 @@ export class ProductUsecase {
             products,
             totalCount
         }
+    }
+
+    async updateProduct(id: number, { price }: UpdateProductParams): Promise<Product | null> {
+        const repo = this.db.getRepository(Product)
+        const productfound = await repo.findOneBy({ id })
+        if (productfound === null) return null
+
+        if (price) {
+            productfound.price = price
+        }
+
+        const productUpdate = await repo.save(productfound)
+        return productUpdate
     }
 }
