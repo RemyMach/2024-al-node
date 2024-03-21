@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { listProductValidation as listProductsValidation, ProductRequest, productValidation, updateProductValidation } from "./validators/product-validator";
+import { listProductValidation as listProductsValidation, productIdValidation, ProductRequest, productValidation, updateProductValidation } from "./validators/product-validator";
 import { generateValidationErrorMessage } from "./validators/generate-validation-message";
 import { AppDataSource } from "../database/database";
 import { Product } from "../database/entities/product";
@@ -58,7 +58,7 @@ export const initRoutes = (app: express.Express) => {
 
     app.patch("/products/:id", async (req: Request, res: Response) => {
 
-        const validation = updateProductValidation.validate({...req.params, ...req.body})
+        const validation = updateProductValidation.validate({ ...req.params, ...req.body })
 
         if (validation.error) {
             res.status(400).send(generateValidationErrorMessage(validation.error.details))
@@ -71,10 +71,58 @@ export const initRoutes = (app: express.Express) => {
             const productUsecase = new ProductUsecase(AppDataSource);
             const updatedProduct = await productUsecase.updateProduct(updateProductRequest.id, { ...updateProductRequest })
             if (updatedProduct === null) {
-                res.status(404).send({"error": `product ${updateProductRequest.id} not found`})
+                res.status(404).send({ "error": `product ${updateProductRequest.id} not found` })
                 return
             }
             res.status(200).send(updatedProduct)
+        } catch (error) {
+            console.log(error)
+            res.status(500).send({ error: "Internal error" })
+        }
+    })
+
+    app.get("/products/:id", async (req: Request, res: Response) => {
+        try {
+            const validationResult = productIdValidation.validate(req.params)
+
+            if (validationResult.error) {
+                res.status(400).send(generateValidationErrorMessage(validationResult.error.details))
+                return
+            }
+            const productId = validationResult.value
+
+            const productRepository = AppDataSource.getRepository(Product)
+            const product = await productRepository.findOneBy({ id: productId.id })
+            if (product === null) {
+                res.status(404).send({ "error": `product ${productId.id} not found` })
+                return
+            }
+            res.status(200).send(product)
+        } catch (error) {
+            console.log(error)
+            res.status(500).send({ error: "Internal error" })
+        }
+    })
+
+    app.delete("/products/:id", async (req: Request, res: Response) => {
+        try {
+            const validationResult = productIdValidation.validate(req.params)
+
+            if (validationResult.error) {
+                res.status(400).send(generateValidationErrorMessage(validationResult.error.details))
+                return
+            }
+            const productId = validationResult.value
+
+            const productRepository = AppDataSource.getRepository(Product)
+            const product = await productRepository.findOneBy({ id: productId.id })
+            if (product === null) {
+                res.status(404).send({ "error": `product ${productId.id} not found` })
+                return
+            }
+
+            const productDeleted = await productRepository.remove(product)
+            res.status(200).send(productDeleted)
         } catch (error) {
             console.log(error)
             res.status(500).send({ error: "Internal error" })

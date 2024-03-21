@@ -35,3 +35,11 @@ export interface UpdateProductRequest {
     id: number
     price?: number
 }
+
+export const productIdValidation = Joi.object<ProductIdRequest>({
+    id: Joi.number().required(),
+})
+
+export interface ProductIdRequest {
+    id: number
+}
