@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { ProductCategory } from "./product-category";
 
 @Entity({ name: "product" })
 export class Product {
@@ -14,10 +15,14 @@ export class Product {
     @CreateDateColumn({type: "datetime"})
     createdAt: Date
 
-    constructor(id: number, name: string, price: number, createdAt: Date) {
+    @ManyToOne(() => ProductCategory, (productCategory) => productCategory.products)
+    category: ProductCategory;
+
+    constructor(id: number, name: string, price: number, createdAt: Date, category: ProductCategory) {
         this.id = id
         this.name = name
         this.price = price
         this.createdAt = createdAt
+        this.category = category
     }
 }
