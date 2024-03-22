@@ -12,6 +12,31 @@ export const initRoutes = (app: express.Express) => {
         res.send({ "message": "hello world" })
     })
 
+    /**
+    * @openapi
+    * '/products':
+    *  post:
+    *     tags:
+    *     - Products
+    *     summary: Create a new product
+    *     requestBody:
+    *       required: true
+    *       content:
+    *         application/json:
+    *           schema:
+    *             $ref: '#/components/schemas/CreateProduct'
+    *     responses:
+    *       200:
+    *         description: Product created
+    *         content:
+    *          application/json:
+    *           example:
+    *             "id": "10"
+    *             "name": "Courgette"
+    *             "description": "product description"
+    *             "price": 879
+    *             "createdAt": "2023-04-03T00:25:32.189Z"
+    */
     app.post("/products", async (req: Request, res: Response) => {
         const validation = productValidation.validate(req.body)
 
