@@ -6,6 +6,7 @@ import { Product } from "../database/entities/product";
 import { ProductUsecase } from "../domain/product-usecase";
 import { UserHandler } from "./user";
 import { authMiddleware } from "./middleware/auth-middleware";
+import { invalidPathHandler } from "./errors/invalid-path-handler";
 
 export const initRoutes = (app: express.Express) => {
     app.get("/health", (req: Request, res: Response) => {
@@ -171,4 +172,6 @@ export const initRoutes = (app: express.Express) => {
     })
 
     UserHandler(app)
+
+    app.use(invalidPathHandler);
 }
