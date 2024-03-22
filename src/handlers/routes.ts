@@ -4,6 +4,8 @@ import { generateValidationErrorMessage } from "./validators/generate-validation
 import { AppDataSource } from "../database/database";
 import { Product } from "../database/entities/product";
 import { ProductUsecase } from "../domain/product-usecase";
+import { UserHandler } from "./user";
+import { authMiddleware } from "./middleware/auth-middleware";
 
 export const initRoutes = (app: express.Express) => {
     app.get("/health", (req: Request, res: Response) => {
@@ -31,7 +33,7 @@ export const initRoutes = (app: express.Express) => {
         }
     })
 
-    app.get("/products", async (req: Request, res: Response) => {
+    app.get("/products", authMiddleware, async (req: Request, res: Response) => {
         const validation = listProductsValidation.validate(req.query)
 
         if (validation.error) {
@@ -128,4 +130,6 @@ export const initRoutes = (app: express.Express) => {
             res.status(500).send({ error: "Internal error" })
         }
     })
+
+    UserHandler(app)
 }

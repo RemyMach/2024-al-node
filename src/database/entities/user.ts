@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from "typeorm"
+import { Token } from "./token"
 
 @Entity()
 export class User {
@@ -16,10 +17,14 @@ export class User {
     @CreateDateColumn({type: "datetime"})
     createdAt: Date
 
-    constructor(id: number, email: string, password: string, createdAt: Date) {
+    @OneToMany(() => Token, token => token.user)
+    tokens: Token[];
+
+    constructor(id: number, email: string, password: string, createdAt: Date, tokens: Token[]) {
         this.id = id;
         this.email = email; 
         this.password = password;
         this.createdAt = createdAt;
+        this.tokens = tokens;
     }
 }
