@@ -3,6 +3,7 @@ import { initRoutes } from "./handlers/routes";
 import { AppDataSource } from "./database/database";
 import 'dotenv/config';
 import { swaggerDocs } from "./swagger/swagger";
+import "reflect-metadata"
 
 
 const main = async () => {
@@ -20,10 +21,12 @@ const main = async () => {
     }
 
     app.use(express.json())
+    
+    swaggerDocs(app, port)
+
     initRoutes(app)
     app.listen(port, () => {
         console.log(`Server running on port ${port}`)
-        swaggerDocs(app, port)
     })
 }
 

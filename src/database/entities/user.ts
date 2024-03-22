@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from "typeorm"
 import { Token } from "./token"
-
+import "reflect-metadata"
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
