@@ -30,12 +30,26 @@ export const initRoutes = (app: express.Express) => {
     *         description: Product created
     *         content:
     *          application/json:
+    *           schema:
+    *              $ref: '#/components/schemas/Product'
     *           example:
     *             "id": "10"
     *             "name": "Courgette"
     *             "description": "product description"
     *             "price": 879
     *             "createdAt": "2023-04-03T00:25:32.189Z"
+    *       500:
+    *         description: Internal Error
+    *         content:
+    *          application/json:
+    *            schema:
+    *              type: object
+    *              properties:
+    *                error:
+    *                  type: string
+    *                  description: error message
+    *              example:
+    *                error: 'Internal error'
     */
     app.post("/products", async (req: Request, res: Response) => {
         const validation = productValidation.validate(req.body)
